@@ -1,41 +1,59 @@
 // src/Header.js
 import React from 'react';
-import { Navbar, Nav, Container, Image } from 'react-bootstrap';
-import logo from '../logo.png'; 
+import logo from '../utils/logo.png'; 
 import profile from '../profile.png'; 
-import '../index.css'
+import '../index.css'; // Ensure Tailwind CSS is included here
 
 const Header = () => {
-	return (
-	  <Navbar bg="primary" variant="dark" expand="lg">
-		<Container>
-		  <Navbar.Brand href="#home">
-			<Image src={logo} width="30" height="30" className="d-inline-block align-top" alt="Logo" />
-		  </Navbar.Brand>
-		  <Navbar.Toggle aria-controls="basic-navbar-nav" />
-		  <Navbar.Collapse id="basic-navbar-nav">
-			<Nav className="me-auto">
-			  <Nav.Link href="#Dashboard" className="fw-bold">Dashboard</Nav.Link>
-			  <Nav.Link href="#Workflow Builder" className="fw-bold underline ">Workflow Builder</Nav.Link>			
-			    <Nav.Link href="#Screen Builder" className="fw-bold">Screen Builder</Nav.Link>
-			  <Nav.Link href="#APK Builder" className="fw-bold">APK Builder</Nav.Link>
-			</Nav>
-			<Nav className="ms-auto d-flex align-items-center">
-			  <Nav.Link href="#profile" className="ms-3">
-				<Image
-				  src={profile}
-				  roundedCircle
-				  style={{ width: '50px', height: '30px' }}
-				  alt="Profile"
-				/>
-			  </Nav.Link>
-			</Nav>
-		  </Navbar.Collapse>
-		</Container>
-	  </Navbar>
-	);
-  };
-  
+  return (
+    <nav className="bg-blue-700 text-white shadow-md">
+      <div className="container mx-auto flex items-center justify-between p-3 space-x-6">
+        <a href="#home" className="flex items-center "> 
+          <img src={logo}  width="30" height="30" alt="Logo" className='text-white' />
+        </a>
+	
+        <div className="hidden md:flex flex-grow items-center space-x-6">
+		<p className="font-bold pt-2.5 text-gray-300 hover:text-white focus:text-white transition-colors ">Low code platform</p>
 
+          <a 
+            href="#Dashboard" 
+            className="font-bold text-gray-300 hover:text-white focus:text-white transition-colors duration-300"
+          >
+            Dashboard
+          </a>
+          <a 
+            href="#Workflow Builder" 
+            className="font-bold text-gray-300 hover:text-white focus:text-white transition-colors duration-300"
+          >
+            Workflow Builder
+          </a>
+          <a 
+            href="#Screen Builder" 
+            className="font-bold text-gray-300 hover:text-white focus:text-white transition-colors duration-300"
+          >
+            Screen Builder
+          </a>
+          <a 
+            href="#APK Builder" 
+            className="font-bold text-gray-300 hover:text-white focus:text-white transition-colors duration-300"
+          >
+            APK Builder
+          </a>
+        </div>
+        <div className="flex items-center">
+          <a href="#profile" className="ml-3">
+            <img
+              src={profile}
+              width="50"
+              height="30"
+              className="rounded-full"
+              alt="Profile"
+            />
+          </a>
+        </div>
+      </div>
+    </nav>
+  );
+};
 
 export default Header;
