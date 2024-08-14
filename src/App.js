@@ -10,10 +10,12 @@ function App() {
   return (
     <Router>
       <Routes>
-        {/* Define routes for your pages */}
+      
         <Route path="/" element={<Dashboard />} />
         <Route path="/canvas" element={<Canvas />} /> 
-        {/* Add more routes as needed */}
+        <Route path="/dashboard" element={<Dashboard  />} />
+
+       
       </Routes>
     </Router>
   );

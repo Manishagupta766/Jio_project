@@ -1,8 +1,8 @@
-// src/Header.js
+
 import React from 'react';
 import logo from '../utils/logo.png'; 
 import profile from '../profile.png'; 
-import '../index.css'; // Ensure Tailwind CSS is included here
+import '../index.css';
 
 const Header = () => {
   return (

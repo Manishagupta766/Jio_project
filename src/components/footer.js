@@ -2,14 +2,15 @@ import React, { useState } from 'react';
 import ButtonComponent from './footerButton';
 import WorkflowModal from './workflowModal';
 
-const Footer = () => {
-  const [showModal, setShowModal] = useState(false);
-  const [modalTitle, setModalTitle] = useState('');
+const Footer = (props) => {
   
+  const [modalTitle, setModalTitle] = useState('');
+  const {setShowModal , showModal} = props;
   const handleClick = (buttonName) => {
     setModalTitle(buttonName);
     setShowModal(true);
   };
+  
   const handleDeployWorkflow = (buttonName) => {
     alert("handle Deploy Workflow")
   };

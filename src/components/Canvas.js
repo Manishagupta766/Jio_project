@@ -1,5 +1,5 @@
 import React, { useState, useCallback } from 'react';
-import 'reactflow/dist/style.css'; // Remove if causing issues
+import 'reactflow/dist/style.css'; 
 import ReactFlow, { MiniMap, Controls, Background, addEdge, useNodesState, useEdgesState } from 'reactflow';
 import CanvasSide from './CanvasSide';
 

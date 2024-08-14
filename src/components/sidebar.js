@@ -1,5 +1,6 @@
-import React from 'react';
-import '../index.css'; 
+import React, { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import '../index.css';
 
 const CustomButton = ({ text, onClick }) => {
   return (
@@ -12,7 +13,35 @@ const CustomButton = ({ text, onClick }) => {
   );
 };
 
-const Sidebar = () => {
+const Sidebar = (props) => {
+  const navigate = useNavigate();
+  const [workflows, setWorkflows] = useState([]);
+  const [filteredWorkflows, setFilteredWorkflows] = useState([]);
+ const {showModal}= props;
+  const [selectedWorkflow, setSelectedWorkflow] = useState('');
+
+  useEffect(() => {
+    const savedWorkflows = JSON.parse(localStorage.getItem('workflows')) || [];
+    setWorkflows(savedWorkflows);
+    setFilteredWorkflows(savedWorkflows);
+  }, [showModal]);
+
+  
+
+ 
+
+  const handleDropdownChange = (e) => {
+    const selectedId = e.target.value;
+    
+    setSelectedWorkflow(selectedId);
+
+    const selectedWorkflow = workflows.find(workflow => workflow._id === selectedId);
+     if (selectedWorkflow) {
+    //  need to change nevigate part 
+   navigate('/', { state: { workflowName: selectedWorkflow.workflowName } });
+     }
+  };
+
   const buttonLabels = [
     'Start Event',
     'User Event',
@@ -22,17 +51,20 @@ const Sidebar = () => {
   ];
 
   return (
-    
     <div className="p-3 bg-white border-r border-gray-200" style={{ width: '400px' }}>
       <div className="relative mb-4">
         <select
-          id="underline_select"
+          id="workflow_select"
           className="block py-2.5 px-0 w-full text-md text-gray-500 bg-transparent border-b-2 border-black focus:outline-none focus:ring-0 focus:border-black"
+          value={selectedWorkflow}
+          onChange={handleDropdownChange}
         >
-          <option value="" disabled selected>Select Workflow</option>
-          <option value="1">Workflow 1</option>
-          <option value="2">Workflow 2</option>
-          <option value="3">Workflow 3</option>
+          <option value="" disabled>Select Workflow</option>
+          {filteredWorkflows.map(workflow => (
+            <option key={workflow._id} value={workflow._id}>
+              {workflow.workflowName}
+            </option>
+          ))}
         </select>
       </div>
 

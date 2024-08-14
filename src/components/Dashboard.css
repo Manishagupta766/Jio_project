@@ -1,0 +1,60 @@
+/* Add this to index.css or your CSS module */
+
+.flex {
+    display: flex;
+  }
+  
+  .items-center {
+    align-items: center;
+  }
+  
+  .justify-between {
+    justify-content: space-between;
+  }
+  
+  .mb-4 {
+    margin-bottom: 1rem;
+  }
+  
+  .text-lg {
+    font-size: 1.125rem;
+  }
+  
+  .font-semibold {
+    font-weight: 600;
+  }
+  
+  .text-xl {
+    font-size: 1.25rem;
+  }
+  
+  .font-extrabold {
+    font-weight: 800;
+  }
+  
+  .d-flex {
+    display: flex;
+  }
+  
+  .flex-column {
+    flex-direction: column;
+  }
+  
+  .flex-grow-1 {
+    flex-grow: 1;
+  }
+  
+  .ms-3 {
+    margin-left: 1rem;
+  }
+  
+  .p-2 {
+    padding: 0.5rem;
+  }
+  
+  .mt-1 {
+    margin-top: 0.25rem;
+  }
+  
+  /* //localstorage se get 
+      // we can use redux by defining state  */
