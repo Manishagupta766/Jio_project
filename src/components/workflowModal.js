@@ -33,14 +33,14 @@ const WorkflowModal = ({ show, handleClose, title }) => {
 
       existingWorkflows.push(newWorkflow);
 
-      localStorage.setItem('workflows', JSON.stringify(existingWorkflows));
+      localStorage.setItem(`workflows`, JSON.stringify(newWorkflow));
 
       const jsonString = JSON.stringify(existingWorkflows, null, 2);
       const blob = new Blob([jsonString], { type: 'application/json' });
       const url = URL.createObjectURL(blob);
       const link = document.createElement('a');
       link.href = url;
-      link.download = 'workflows.json';
+      link.download = ' newworkflows.json';
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
