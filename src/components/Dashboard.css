@@ -58,3 +58,11 @@
   
   /* //localstorage se get 
       // we can use redux by defining state  */
+      /* Dashboard.css */
+
+.reactflow-wrapper {
+  height: 100%;
+  width: 100%;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+}

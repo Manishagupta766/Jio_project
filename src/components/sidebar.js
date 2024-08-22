@@ -1,5 +1,6 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import PropTypes from 'prop-types';
 import '../index.css';
 
 const CustomButton = ({ text, onClick }) => {
@@ -7,39 +8,53 @@ const CustomButton = ({ text, onClick }) => {
     <div 
       className="bg-gray-300 bg-opacity-90 text-black p-3 rounded-lg border-2 my-4 mx-auto text-center cursor-pointer text-lg transition-all duration-300 hover:bg-opacity-80"
       onClick={onClick}
+      role="button"
+      tabIndex={0}
+      onKeyDown={(e) => { if (e.key === 'Enter') onClick(); }}
     >
       {text}
     </div>
   );
 };
 
-const Sidebar = (props) => {
+CustomButton.propTypes = {
+  text: PropTypes.string.isRequired,
+  onClick: PropTypes.func.isRequired,
+};
+
+const Sidebar = ({ showModal, onWorkflowSelect }) => {
   const navigate = useNavigate();
   const [workflows, setWorkflows] = useState([]);
   const [filteredWorkflows, setFilteredWorkflows] = useState([]);
- const {showModal}= props;
   const [selectedWorkflow, setSelectedWorkflow] = useState('');
 
   useEffect(() => {
-    const savedWorkflows = JSON.parse(localStorage.getItem('workflows')) || [];
-    setWorkflows(savedWorkflows);
-    setFilteredWorkflows(savedWorkflows);
+    try {
+      const savedWorkflows = JSON.parse(localStorage.getItem('workflows')) || [];
+      
+      if (Array.isArray(savedWorkflows)) {
+        setWorkflows(savedWorkflows);
+        setFilteredWorkflows(savedWorkflows);
+      } else {
+        setWorkflows([]);
+        setFilteredWorkflows([]);
+      }
+    } catch (error) {
+      console.error('Failed to parse workflows from localStorage:', error);
+      setWorkflows([]);
+      setFilteredWorkflows([]);
+    }
   }, [showModal]);
-
-  
-
- 
 
   const handleDropdownChange = (e) => {
     const selectedId = e.target.value;
-    
     setSelectedWorkflow(selectedId);
 
-    const selectedWorkflow = workflows.find(workflow => workflow._id === selectedId);
-     if (selectedWorkflow) {
-    //  need to change nevigate part 
-   navigate('/', { state: { workflowName: selectedWorkflow.workflowName } });
-     }
+    const selectedWorkflowObj = workflows.find(workflow => workflow._id === selectedId);
+    if (selectedWorkflowObj) {
+      onWorkflowSelect(selectedWorkflowObj.workflowName);  // Call the function passed from Dashboard
+      navigate('/', { state: { workflowName: selectedWorkflowObj.workflowName } });
+    }
   };
 
   const buttonLabels = [
@@ -75,6 +90,11 @@ const Sidebar = (props) => {
       ))}
     </div>
   );
+};
+
+Sidebar.propTypes = {
+  showModal: PropTypes.bool.isRequired,
+  onWorkflowSelect: PropTypes.func.isRequired,
 };
 
 export default Sidebar;

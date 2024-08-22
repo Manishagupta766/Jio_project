@@ -1,65 +1,67 @@
-import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useState } from 'react';
 
-const WorkflowModal = ({ show, handleClose, title }) => {
+const WorkflowModal = ({ show, handleClose, title, onCreate }) => {
   const [workflowName, setWorkflowName] = useState('');
   const [workflowDesc, setWorkflowDesc] = useState('');
   const [nameExists, setNameExists] = useState(false);
-  const navigate = useNavigate();
-
-  useEffect(() => {
-    if (!localStorage.getItem('workflows')) {
-      localStorage.setItem('workflows', JSON.stringify([]));
-    }
-  }, []);
+  const [createdWorkflowName, setCreatedWorkflowName] = useState('');
+  const [errors, setErrors] = useState({});
 
   const handleCreate = () => {
-    if (workflowName && workflowDesc) {
-      const existingWorkflows = JSON.parse(localStorage.getItem('workflows')) || [];
-
+    const newErrors = {};
+    if (!workflowName) newErrors.name = 'Workflow name is required.';
+    if (!workflowDesc) newErrors.desc = 'Workflow description is required.';
     
-      const isDuplicate = existingWorkflows.some(workflow => workflow.workflowName === workflowName);
-      if (isDuplicate) {
-        setNameExists(true);
-        return;
-      }
-
-      const newWorkflow = {
-        _id: `${workflowName}_${Date.now()}`, 
-        workflowName,
-        workflowDesc,
-        flow: []
-      };
-
-      existingWorkflows.push(newWorkflow);
-
-      localStorage.setItem(`workflows`, JSON.stringify(newWorkflow));
-
-      const jsonString = JSON.stringify(existingWorkflows, null, 2);
-      const blob = new Blob([jsonString], { type: 'application/json' });
-      const url = URL.createObjectURL(blob);
-      const link = document.createElement('a');
-      link.href = url;
-      link.download = ' newworkflows.json';
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-
-      navigate('/dashboard', { state: { workflowName } });
-
-      setWorkflowName('');
-      setWorkflowDesc('');
-      setNameExists(false);
-
-      handleClose(); 
-    } else {
-      alert('Please fill in all fields.');
+    if (Object.keys(newErrors).length > 0) {
+      setErrors(newErrors);
+      return;
     }
+
+    const uniqueKey = `workflow_${workflowName}_${Date.now()}`;
+
+    if (localStorage.getItem(uniqueKey)) {
+      setNameExists(true);
+      return;
+    }
+
+    const newWorkflow = {
+      _id: uniqueKey,
+      workflowName,
+      workflowDesc,
+      flow: [],
+    };
+
+    localStorage.setItem(uniqueKey, JSON.stringify(newWorkflow));
+
+    onCreate(workflowName);
+
+    setCreatedWorkflowName(workflowName);
+    setWorkflowName('');
+    setWorkflowDesc('');
+    setNameExists(false);
+    setErrors({});
+    handleClose();
+
+    const jsonString = JSON.stringify(newWorkflow, null, 2);
+    const blob = new Blob([jsonString], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `workflow_${newWorkflow._id}.json`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
   };
 
   const handleNameChange = (e) => {
     setWorkflowName(e.target.value);
-    setNameExists(false); 
+    setNameExists(false);
+    setErrors((prevErrors) => ({ ...prevErrors, name: null }));
+  };
+
+  const handleDescChange = (e) => {
+    setWorkflowDesc(e.target.value);
+    setErrors((prevErrors) => ({ ...prevErrors, desc: null }));
   };
 
   if (!show) return null;
@@ -86,6 +88,7 @@ const WorkflowModal = ({ show, handleClose, title }) => {
                 onChange={handleNameChange}
                 className="block py-2.5 px-0 w-full text-md text-gray-500 bg-transparent border-b-2 border-black focus:outline-none focus:ring-0 focus:border-black"
               />
+              {errors.name && <p className="text-red-500 text-sm mt-1">{errors.name}</p>}
               {nameExists && <p className="text-red-500 text-sm mt-1">This workflow name already exists. Please choose a different name.</p>}
             </div>
 
@@ -97,9 +100,10 @@ const WorkflowModal = ({ show, handleClose, title }) => {
               <input 
                 type="text" 
                 value={workflowDesc}
-                onChange={(e) => setWorkflowDesc(e.target.value)}
+                onChange={handleDescChange}
                 className="block py-2.5 px-0 w-full text-md text-gray-500 bg-transparent border-b-2 border-black focus:outline-none focus:ring-0 focus:border-black"
               />
+              {errors.desc && <p className="text-red-500 text-sm mt-1">{errors.desc}</p>}
             </div>
           </form>
         </div>
@@ -119,6 +123,13 @@ const WorkflowModal = ({ show, handleClose, title }) => {
             Create
           </button>
         </div>
+        {createdWorkflowName && (
+          <div className="p-4">
+            <p className="text-green-500 text-md">
+              Workflow "{createdWorkflowName}" has been created successfully!
+            </p>
+          </div>
+        )}
       </div>
     </div>
   );
