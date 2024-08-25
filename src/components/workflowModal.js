@@ -52,7 +52,8 @@ const WorkflowModal = ({ show, handleClose, title, onCreate }) => {
     link.click();
     document.body.removeChild(link);
   };
-
+  
+  
   const handleNameChange = (e) => {
     setWorkflowName(e.target.value);
     setNameExists(false);
