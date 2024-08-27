@@ -3,7 +3,9 @@ import { useNavigate } from 'react-router-dom';
 import PropTypes from 'prop-types';
 import '../index.css';
 
-const CustomButton = ({ text, onClick }) => {
+import { useDnD } from './DnDContext';
+
+const CustomButton = ({ text, onClick, onDragStart }) => {
   return (
     <div 
       className="bg-gray-300 bg-opacity-90 text-black p-3 rounded-lg border-2 my-4 mx-auto text-center cursor-pointer text-lg transition-all duration-300 hover:bg-opacity-80"
@@ -11,6 +13,8 @@ const CustomButton = ({ text, onClick }) => {
       role="button"
       tabIndex={0}
       onKeyDown={(e) => { if (e.key === 'Enter') onClick(); }}
+      draggable
+      onDragStart={onDragStart}
     >
       {text}
     </div>
@@ -20,6 +24,7 @@ const CustomButton = ({ text, onClick }) => {
 CustomButton.propTypes = {
   text: PropTypes.string.isRequired,
   onClick: PropTypes.func.isRequired,
+  onDragStart: PropTypes.func.isRequired,
 };
 
 const Sidebar = ({ showModal, onWorkflowSelect }) => {
@@ -57,6 +62,13 @@ const Sidebar = ({ showModal, onWorkflowSelect }) => {
     }
   };
 
+  const { handleDragStart } = useDnD();
+
+  const onDragStart = (event, itemType) => {
+    event.dataTransfer.setData('text/plain', itemType);
+    handleDragStart(itemType);
+  };
+
   const buttonLabels = [
     'Start Event',
     'User Event',
@@ -86,7 +98,12 @@ const Sidebar = ({ showModal, onWorkflowSelect }) => {
       <h5 className="mb-4 mt-4 text-lg font-semibold">You can drag these nodes to the pane on the right.</h5>
 
       {buttonLabels.map((label, index) => (
-        <CustomButton key={index} text={label} onClick={() => alert(`${label} clicked!`)} />
+        <CustomButton 
+          key={index}
+          text={label} 
+          onClick={() => alert(`${label} clicked!`)}  
+          onDragStart={(event) => onDragStart(event, label)}
+        />
       ))}
     </div>
   );
@@ -98,3 +115,4 @@ Sidebar.propTypes = {
 };
 
 export default Sidebar;
+

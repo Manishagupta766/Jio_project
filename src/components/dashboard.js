@@ -3,7 +3,9 @@ import Header from './header';
 import Footer from './footer';
 import Sidebar from './sidebar';
 import WorkflowModal from './workflowModal';
-import './Dashboard.css';
+import { DnDProvider } from './DnDContext';
+import DnDFlow from './DnDFlow'; 
+import './Dashboard.css'; 
 
 const Dashboard = () => {
   const [showModal, setShowModal] = useState(false);
@@ -13,14 +15,10 @@ const Dashboard = () => {
     setWorkflowName(name);
   };
 
-  const handleWorkflowSelect = (name) => {
-    setWorkflowName(name);
-  };
-
   return (
     <div className="d-flex flex-column min-vh-100">
       <Header />
-      
+
       {workflowName && (
         <div className="container-fluid bg-slate-100 w-100">
           <h2 className="ml-4 text-lg font-semibold">
@@ -30,16 +28,22 @@ const Dashboard = () => {
       )}
 
       <div className="flex-fill d-flex mt-1">
-        <div className="content flex-grow-1 ms-3 p-2 flex items-center justify-center">
-          <div className="flex items-center">
-            <h1 className="text-center text-xl font-extrabold">
-              Drag and drop the task element to build workflow
-            </h1>
+        <DnDProvider>
+          <div className="flex-1 flex flex-col items-center justify-center">
+            {workflowName ? (
+              <DnDFlow />
+            ) : (
+              <div className="flex items-center justify-center h-full w-full">
+                <h1 className="text-xl font-extrabold">
+                  Drag and drop the task element to build workflow
+                </h1>
+              </div>
+            )}
           </div>
-        </div>
-        <Sidebar showModal={showModal} onWorkflowSelect={handleWorkflowSelect} />
+          <Sidebar />
+        </DnDProvider>
       </div>
-      
+
       <Footer setShowModal={setShowModal} showModal={showModal} />
 
       <WorkflowModal
