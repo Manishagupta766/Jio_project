@@ -1,38 +1,19 @@
-import React, { createContext, useContext, useState } from 'react';
+import { createContext, useContext, useState } from 'react';
 
-const DnDContext = createContext();
+const DnDContext = createContext([null, (_) => {}]);
 
 export const DnDProvider = ({ children }) => {
-  const [draggedItem, setDraggedItem] = useState(null);
-  const [droppedItems, setDroppedItems] = useState([]);
-
-  const handleDragStart = (itemType) => {
-    setDraggedItem(itemType);
-  };
-
-  const handleDrop = (event) => {
-    event.preventDefault();
-    if (draggedItem) {
-      setDroppedItems((prevItems) => [...prevItems, draggedItem]);
-      setDraggedItem(null); 
-    }
-  };
-
-  const handleDragOver = (event) => {
-    event.preventDefault(); 
-  };
+  const [type, setType] = useState(null);
 
   return (
-    <DnDContext.Provider value={{ draggedItem, droppedItems, handleDragStart, handleDrop, handleDragOver }}>
+    <DnDContext.Provider value={[type, setType]}>
       {children}
     </DnDContext.Provider>
   );
-};
+}
+
+export default DnDContext;
 
 export const useDnD = () => {
-  const context = useContext(DnDContext);
-  if (!context) {
-    throw new Error('useDnD must be used within a DnDProvider');
-  }
-  return context;
-};
+  return useContext(DnDContext);
+}

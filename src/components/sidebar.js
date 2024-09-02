@@ -7,7 +7,7 @@ import { useDnD } from './DnDContext';
 
 const CustomButton = ({ text, onClick, onDragStart }) => {
   return (
-    <div 
+    <div
       className="bg-gray-300 bg-opacity-90 text-black p-3 rounded-lg border-2 my-4 mx-auto text-center cursor-pointer text-lg transition-all duration-300 hover:bg-opacity-80"
       onClick={onClick}
       role="button"
@@ -36,7 +36,6 @@ const Sidebar = ({ showModal, onWorkflowSelect }) => {
   useEffect(() => {
     try {
       const savedWorkflows = JSON.parse(localStorage.getItem('workflows')) || [];
-      
       if (Array.isArray(savedWorkflows)) {
         setWorkflows(savedWorkflows);
         setFilteredWorkflows(savedWorkflows);
@@ -57,25 +56,23 @@ const Sidebar = ({ showModal, onWorkflowSelect }) => {
 
     const selectedWorkflowObj = workflows.find(workflow => workflow._id === selectedId);
     if (selectedWorkflowObj) {
-      onWorkflowSelect(selectedWorkflowObj.workflowName);  // Call the function passed from Dashboard
+      if (typeof onWorkflowSelect === 'function') {
+        onWorkflowSelect(selectedWorkflowObj.workflowName);
+      } else {
+        console.error('onWorkflowSelect is not a function');
+      }
       navigate('/', { state: { workflowName: selectedWorkflowObj.workflowName } });
     }
   };
 
-  const { handleDragStart } = useDnD();
+  const [_, setType] = useDnD();
 
-  const onDragStart = (event, itemType) => {
-    event.dataTransfer.setData('text/plain', itemType);
-    handleDragStart(itemType);
+  const onDragStart = (event, nodeType) => {
+    console.log('event', event);
+    setType(nodeType);
+    event.dataTransfer.setData("application/reactflow", nodeType);
+    event.dataTransfer.effectAllowed = "move";
   };
-
-  const buttonLabels = [
-    'Start Event',
-    'User Event',
-    'Conditional Event',
-    'Sub Processes',
-    'End Event'
-  ];
 
   return (
     <div className="p-3 bg-white border-r border-gray-200" style={{ width: '400px' }}>
@@ -97,14 +94,18 @@ const Sidebar = ({ showModal, onWorkflowSelect }) => {
 
       <h5 className="mb-4 mt-4 text-lg font-semibold">You can drag these nodes to the pane on the right.</h5>
 
-      {buttonLabels.map((label, index) => (
-        <CustomButton 
-          key={index}
-          text={label} 
-          onClick={() => alert(`${label} clicked!`)}  
-          onDragStart={(event) => onDragStart(event, label)}
-        />
-      ))}
+      <CustomButton
+        text='Start Event'
+        onDragStart={(event) => onDragStart(event, 'input')}
+      />
+      <CustomButton
+        text="Users Event"
+        onDragStart={(event) => onDragStart(event, 'default')}
+      />
+      <CustomButton
+        text="End Event"
+        onDragStart={(event) => onDragStart(event, 'Output')}
+      />
     </div>
   );
 };
@@ -115,4 +116,3 @@ Sidebar.propTypes = {
 };
 
 export default Sidebar;
-

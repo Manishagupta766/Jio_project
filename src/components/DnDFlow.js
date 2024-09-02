@@ -1,28 +1,109 @@
-import React from 'react';
-import { useDnD } from './DnDContext';
+import React, { useRef, useCallback } from 'react';
+import {
+  ReactFlow,
+  ReactFlowProvider,
+  addEdge,
+  useNodesState,
+  useEdgesState,
+  Controls,
+  useReactFlow,
+} from '@xyflow/react';
+import '@xyflow/react/dist/style.css';
+
+import Sidebar from './sidebar';
+import { DnDProvider, useDnD } from './DnDContext';
+
+let id = 0;
+const getId = () => `dndnode_${id++}`;
 
 const DnDFlow = () => {
-  const { droppedItems, handleDrop, handleDragOver } = useDnD();
+  const reactFlowWrapper = useRef(null);
+  const [nodes, setNodes, onNodesChange] = useNodesState([]);
+  const [edges, setEdges, onEdgesChange] = useEdgesState([]);
+  const { screenToFlowPosition } = useReactFlow();
+  const [type] = useDnD();
+
+  const onConnect = useCallback(
+    (params) => setEdges((eds) => addEdge(params, eds)),
+    [setEdges]
+  );
+
+  const onDragOver = useCallback((event) => {
+    event.preventDefault();
+    event.dataTransfer.dropEffect = 'move';
+  }, []);
+
+  const onDrop = useCallback(
+    (event) => {
+      event.preventDefault();
+
+      if (!type) {
+        return;
+      }
+
+      const position = screenToFlowPosition({
+        x: event.clientX,
+        y: event.clientY,
+      });
+      let newNode;
+      if (type === 'input') {
+        newNode = {
+          id: getId(),
+          type,
+          position,
+          data: { label: 'Start Event' },
+          sourcePosition: 'right',
+        };
+      } else if (type === 'Output') {
+        newNode = {
+          id: getId(),
+          type,
+          position,
+          data: { label: 'End Event' },
+          targetPosition: 'left', 
+        };
+      } else {
+        newNode = {
+          id: getId(),
+          type,
+          position,
+          data: { label: 'User node' }, 
+          sourcePosition: 'right', 
+          targetPosition: 'left', 
+        };
+      }
+
+      setNodes((nds) => nds.concat(newNode));
+    },
+    [screenToFlowPosition, type, setNodes]
+  );
 
   return (
-    <div
-      style={{ flex: 1, border: '2px solid #ddd', padding: '20px' }}
-      onDrop={handleDrop}
-      onDragOver={handleDragOver}
-    >
-      <h2>Drag and drop the task element here</h2>
-      <div style={{ minHeight: '200px', border: '1px dashed #ddd', padding: '10px' }}>
-        {droppedItems.length === 0 && (
-          <p>Drop items here</p>
-        )}
-        {droppedItems.map((item, index) => (
-          <div key={index} style={{ margin: '5px', padding: '10px', backgroundColor: '#e0e0e0' }}>
-            {item}
-          </div>
-        ))}
+    <div className="dndflow" style={{ width: "100%" }}>
+      <div className="reactflow-wrapper" ref={reactFlowWrapper}>
+        <ReactFlow
+          nodes={nodes}
+          edges={edges}
+          onNodesChange={onNodesChange}
+          onEdgesChange={onEdgesChange}
+          onConnect={onConnect}
+          onDrop={onDrop}
+          onDragOver={onDragOver}
+          fitView
+        >
+          <Controls />
+        </ReactFlow>
       </div>
+      <Sidebar />
     </div>
   );
 };
 
-export default DnDFlow;
+export default () => (
+  <ReactFlowProvider>
+    <DnDProvider>
+      <DnDFlow />
+    </DnDProvider>
+  </ReactFlowProvider>
+);
+
