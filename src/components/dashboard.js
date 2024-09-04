@@ -10,10 +10,9 @@ import './Dashboard.css';
 const Dashboard = () => {
   const [showModal, setShowModal] = useState(false);
   const [workflowName, setWorkflowName] = useState('');
-  const [workflows, setWorkflows] = useState([]);  // Add state for workflows
+  const [workflows, setWorkflows] = useState([]); 
 
   useEffect(() => {
-    // Fetch the workflows from localStorage when the component mounts
     const savedWorkflows = JSON.parse(localStorage.getItem('workflows')) || [];
     setWorkflows(savedWorkflows);
   }, []);
@@ -26,13 +25,13 @@ const Dashboard = () => {
 
     const updatedWorkflows = [...workflows, newWorkflow];
 
-    // Update the workflows state
+    
     setWorkflows(updatedWorkflows);
 
-    // Update localStorage
+    
     localStorage.setItem('workflows', JSON.stringify(updatedWorkflows));
 
-    // Set the new workflow name in the state
+   
     setWorkflowName(newWorkflow.workflowName);
   };
 
@@ -63,7 +62,7 @@ const Dashboard = () => {
                 <Sidebar
                   showModal={showModal}
                   onWorkflowSelect={setWorkflowName}
-                  workflows={workflows}  // Pass workflows as a prop
+                  workflows={workflows}
                 />
               </div>
             </>

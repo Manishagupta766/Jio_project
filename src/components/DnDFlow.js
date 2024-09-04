@@ -12,6 +12,7 @@ import '@xyflow/react/dist/style.css';
 
 import Sidebar from './sidebar';
 import { DnDProvider, useDnD } from './DnDContext';
+import UserNode from './UserNode'; 
 
 let id = 0;
 const getId = () => `dndnode_${id++}`;
@@ -60,16 +61,16 @@ const DnDFlow = () => {
           type,
           position,
           data: { label: 'End Event' },
-          targetPosition: 'left', 
+          targetPosition: 'left',
         };
       } else {
         newNode = {
           id: getId(),
-          type,
+          type: 'userNode', 
           position,
-          data: { label: 'User node' }, 
-          sourcePosition: 'right', 
-          targetPosition: 'left', 
+          data: { label: 'User node' },
+          sourcePosition: 'right',
+          targetPosition: 'left',
         };
       }
 
@@ -90,6 +91,7 @@ const DnDFlow = () => {
           onDrop={onDrop}
           onDragOver={onDragOver}
           fitView
+          nodeTypes={{ userNode: UserNode }} // Register UserNode here
         >
           <Controls />
         </ReactFlow>
@@ -106,4 +108,3 @@ export default () => (
     </DnDProvider>
   </ReactFlowProvider>
 );
-
