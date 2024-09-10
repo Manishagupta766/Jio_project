@@ -1,4 +1,4 @@
-import React, { useRef, useCallback } from 'react';
+import React, { useRef, useCallback, useState } from 'react';
 import {
   ReactFlow,
   ReactFlowProvider,
@@ -9,20 +9,22 @@ import {
   useReactFlow,
 } from '@xyflow/react';
 import '@xyflow/react/dist/style.css';
+import { useDnD } from './DnDContext';
 
 import Sidebar from './sidebar';
-import { DnDProvider, useDnD } from './DnDContext';
 import UserNode from './UserNode'; 
 
 let id = 0;
 const getId = () => `dndnode_${id++}`;
 
-const DnDFlow = () => {
+const DnDFlow = ({ showModal, onWorkflowSelect, workflows }) => {
   const reactFlowWrapper = useRef(null);
   const [nodes, setNodes, onNodesChange] = useNodesState([]);
   const [edges, setEdges, onEdgesChange] = useEdgesState([]);
   const { screenToFlowPosition } = useReactFlow();
-  const [type] = useDnD();
+  const [selectedWorkflow, setSelectedWorkflow] = useState(null);
+  const[type]=useDnD();
+
 
   const onConnect = useCallback(
     (params) => setEdges((eds) => addEdge(params, eds)),
@@ -37,15 +39,12 @@ const DnDFlow = () => {
   const onDrop = useCallback(
     (event) => {
       event.preventDefault();
+      const position = screenToFlowPosition({ x: event.clientX, y: event.clientY });
 
-      if (!type) {
+      if(!type){
         return;
       }
-
-      const position = screenToFlowPosition({
-        x: event.clientX,
-        y: event.clientY,
-      });
+      
       let newNode;
       if (type === 'input') {
         newNode = {
@@ -79,6 +78,11 @@ const DnDFlow = () => {
     [screenToFlowPosition, type, setNodes]
   );
 
+  const handleWorkflowSelect = (workflowName) => {
+    setSelectedWorkflow(workflowName);
+    onWorkflowSelect(workflowName); // Callback to set the workflow name
+  };
+
   return (
     <div className="dndflow" style={{ width: "100%" }}>
       <div className="reactflow-wrapper" ref={reactFlowWrapper}>
@@ -91,20 +95,22 @@ const DnDFlow = () => {
           onDrop={onDrop}
           onDragOver={onDragOver}
           fitView
-          nodeTypes={{ userNode: UserNode }} // Register UserNode here
+          nodeTypes={{ userNode: UserNode }}
         >
           <Controls />
         </ReactFlow>
       </div>
-      <Sidebar />
+      <Sidebar
+        showModal={showModal}
+        onWorkflowSelect={handleWorkflowSelect}
+        workflows={workflows}
+      />
     </div>
   );
 };
 
 export default () => (
   <ReactFlowProvider>
-    <DnDProvider>
-      <DnDFlow />
-    </DnDProvider>
+    <DnDFlow />
   </ReactFlowProvider>
 );

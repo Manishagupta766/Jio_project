@@ -50,7 +50,7 @@ const Dashboard = () => {
       <div className="flex flex-1 mt-1">
         <div className="flex-1 flex">
           {workflowName ? (
-            <DnDFlow />
+            <DnDFlow  />
           ) : (
             <>
               <div className="flex items-center justify-center h-full w-full">

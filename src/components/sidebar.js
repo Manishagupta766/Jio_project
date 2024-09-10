@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import PropTypes from 'prop-types';
 import '../index.css';
-
 import { useDnD } from './DnDContext';
 
 const CustomButton = ({ text, onClick, onDragStart }) => {
@@ -23,7 +22,7 @@ const CustomButton = ({ text, onClick, onDragStart }) => {
 
 CustomButton.propTypes = {
   text: PropTypes.string.isRequired,
-  onClick: PropTypes.func.isRequired,
+  onClick: PropTypes.func,
   onDragStart: PropTypes.func.isRequired,
 };
 
@@ -33,6 +32,7 @@ const Sidebar = ({ showModal, onWorkflowSelect }) => {
   const [filteredWorkflows, setFilteredWorkflows] = useState([]);
   const [selectedWorkflow, setSelectedWorkflow] = useState('');
 
+  // Fetch workflows from localStorage on component load
   useEffect(() => {
     try {
       const savedWorkflows = JSON.parse(localStorage.getItem('workflows')) || [];
@@ -50,6 +50,7 @@ const Sidebar = ({ showModal, onWorkflowSelect }) => {
     }
   }, [showModal]);
 
+  // Handle workflow dropdown selection
   const handleDropdownChange = (e) => {
     const selectedId = e.target.value;
     setSelectedWorkflow(selectedId);
@@ -65,17 +66,18 @@ const Sidebar = ({ showModal, onWorkflowSelect }) => {
     }
   };
 
-  const [_, setType] = useDnD();
+  const [_, setType] = useDnD();  // For setting node type for dragging
 
+  // Handles the drag start event
   const onDragStart = (event, nodeType) => {
-    console.log('event', event);
-    setType(nodeType);
+    setType(nodeType);  // Set the node type in the DnD context
     event.dataTransfer.setData("application/reactflow", nodeType);
     event.dataTransfer.effectAllowed = "move";
   };
 
   return (
     <div className="p-3 bg-white border-r border-gray-200" style={{ width: '400px' }}>
+      {/* Workflow Dropdown */}
       <div className="relative mb-4">
         <select
           id="workflow_select"
@@ -92,19 +94,25 @@ const Sidebar = ({ showModal, onWorkflowSelect }) => {
         </select>
       </div>
 
+      {/* Drag Nodes */}
       <h5 className="mb-4 mt-4 text-lg font-semibold">You can drag these nodes to the pane on the right.</h5>
-
+      
+      {/* Start Event Button */}
       <CustomButton
         text='Start Event'
-        onDragStart={(event) => onDragStart(event, 'input')}
+        onDragStart={(event) => onDragStart(event, 'input')}  // Start event node
       />
+      
+      {/* Users Event Button */}
       <CustomButton
         text="Users Event"
-        onDragStart={(event) => onDragStart(event, 'default')}
+        onDragStart={(event) => onDragStart(event, 'default')}  // User event node
       />
+      
+      {/* End Event Button */}
       <CustomButton
         text="End Event"
-        onDragStart={(event) => onDragStart(event, 'Output')}
+        onDragStart={(event) => onDragStart(event, 'output')}  // End event node
       />
     </div>
   );

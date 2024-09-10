@@ -44,8 +44,6 @@ const WorkflowModal = ({ show, handleClose, title, onCreate }) => {
     localStorage.setItem(uniqueKey, JSON.stringify(newWorkflow));
     const updatedWorkflows = [...storedWorkflows, newWorkflow];
     
-
-  // Save the updated list back to localStorage
   localStorage.setItem('workflows', JSON.stringify(updatedWorkflows));
 
 
