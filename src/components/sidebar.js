@@ -39,6 +39,9 @@ const Sidebar = ({ showModal, onWorkflowSelect }) => {
       if (Array.isArray(savedWorkflows)) {
         setWorkflows(savedWorkflows);
         setFilteredWorkflows(savedWorkflows);
+        if (savedWorkflows.length > 0) {
+          setSelectedWorkflow(savedWorkflows[0]._id); // Default to the first workflow
+        }
       } else {
         setWorkflows([]);
         setFilteredWorkflows([]);
@@ -54,9 +57,9 @@ const Sidebar = ({ showModal, onWorkflowSelect }) => {
   const handleDropdownChange = (e) => {
     const selectedId = e.target.value;
     setSelectedWorkflow(selectedId);
-
     const selectedWorkflowObj = workflows.find(workflow => workflow._id === selectedId);
     if (selectedWorkflowObj) {
+      onWorkflowSelect(selectedWorkflowObj.workflowName);  // Call the function passed from Dashboard
       if (typeof onWorkflowSelect === 'function') {
         onWorkflowSelect(selectedWorkflowObj.workflowName);
       } else {
@@ -79,19 +82,23 @@ const Sidebar = ({ showModal, onWorkflowSelect }) => {
     <div className="p-3 bg-white border-r border-gray-200" style={{ width: '400px' }}>
       {/* Workflow Dropdown */}
       <div className="relative mb-4">
-        <select
-          id="workflow_select"
-          className="block py-2.5 px-0 w-full text-md text-gray-500 bg-transparent border-b-2 border-black focus:outline-none focus:ring-0 focus:border-black"
-          value={selectedWorkflow}
-          onChange={handleDropdownChange}
-        >
-          <option value="" disabled>Select Workflow</option>
-          {filteredWorkflows.map(workflow => (
-            <option key={workflow._id} value={workflow._id}>
-              {workflow.workflowName}
-            </option>
-          ))}
-        </select>
+        {filteredWorkflows.length === 0 ? (
+          <p>No workflows available</p>
+        ) : (
+          <select
+            id="workflow_select"
+            className="block py-2.5 px-0 w-full text-md text-gray-500 bg-transparent border-b-2 border-black focus:outline-none focus:ring-0 focus:border-black"
+            value={selectedWorkflow}
+            onChange={handleDropdownChange}
+          >
+            <option value="" disabled>Select Workflow</option>
+            {filteredWorkflows.map(workflow => (
+              <option key={workflow._id} value={workflow._id}>
+                {workflow.workflowName}
+              </option>
+            ))}
+          </select>
+        )}
       </div>
 
       {/* Drag Nodes */}

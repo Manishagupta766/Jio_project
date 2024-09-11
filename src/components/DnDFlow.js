@@ -23,8 +23,7 @@ const DnDFlow = ({ showModal, onWorkflowSelect, workflows }) => {
   const [edges, setEdges, onEdgesChange] = useEdgesState([]);
   const { screenToFlowPosition } = useReactFlow();
   const [selectedWorkflow, setSelectedWorkflow] = useState(null);
-  const[type]=useDnD();
-
+  const [type] = useDnD();
 
   const onConnect = useCallback(
     (params) => setEdges((eds) => addEdge(params, eds)),
@@ -41,10 +40,8 @@ const DnDFlow = ({ showModal, onWorkflowSelect, workflows }) => {
       event.preventDefault();
       const position = screenToFlowPosition({ x: event.clientX, y: event.clientY });
 
-      if(!type){
-        return;
-      }
-      
+      if (!type) return;
+
       let newNode;
       if (type === 'input') {
         newNode = {
@@ -54,7 +51,7 @@ const DnDFlow = ({ showModal, onWorkflowSelect, workflows }) => {
           data: { label: 'Start Event' },
           sourcePosition: 'right',
         };
-      } else if (type === 'Output') {
+      } else if (type === 'output') {
         newNode = {
           id: getId(),
           type,
@@ -67,7 +64,7 @@ const DnDFlow = ({ showModal, onWorkflowSelect, workflows }) => {
           id: getId(),
           type: 'userNode', 
           position,
-          data: { label: 'User node' },
+          data: { label: 'User Node' },
           sourcePosition: 'right',
           targetPosition: 'left',
         };
@@ -80,7 +77,9 @@ const DnDFlow = ({ showModal, onWorkflowSelect, workflows }) => {
 
   const handleWorkflowSelect = (workflowName) => {
     setSelectedWorkflow(workflowName);
-    onWorkflowSelect(workflowName); // Callback to set the workflow name
+    if (typeof onWorkflowSelect === 'function') {
+      onWorkflowSelect(workflowName);
+    }
   };
 
   return (
@@ -108,6 +107,7 @@ const DnDFlow = ({ showModal, onWorkflowSelect, workflows }) => {
     </div>
   );
 };
+
 
 export default () => (
   <ReactFlowProvider>

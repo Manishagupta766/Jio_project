@@ -11,7 +11,7 @@ const UserNode = ({ data, isConnectable }) => {
     <div className="text-updater-node">
       <Handle
         type="target"
-        position={Position.Top}
+        position={Position.Left}
         isConnectable={isConnectable}
       />
       <div>
@@ -25,14 +25,14 @@ const UserNode = ({ data, isConnectable }) => {
       </div>
       <Handle
         type="source"
-        position={Position.Bottom}
+        position={Position.Right}
         id="a"
         style={handleStyle}
         isConnectable={isConnectable}
       />
       <Handle
         type="source"
-        position={Position.Bottom}
+        position={Position.Right}
         id="b"
         isConnectable={isConnectable}
       />

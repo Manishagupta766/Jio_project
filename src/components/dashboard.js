@@ -70,6 +70,7 @@ const Dashboard = () => {
         </div>
       </div>
 
+
       <Footer setShowModal={setShowModal} showModal={showModal} />
 
       <WorkflowModal
@@ -80,6 +81,7 @@ const Dashboard = () => {
       />
     </div>
   );
-};
+}
+
 
 export default Dashboard;
