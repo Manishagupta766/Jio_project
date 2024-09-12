@@ -3,14 +3,16 @@ import Header from './header';
 import Footer from './footer';
 import Sidebar from './sidebar';
 import WorkflowModal from './workflowModal';
-import { DnDProvider } from './DnDContext'; // Use named import
-import DnDFlow from './DnDFlow'; 
-import './Dashboard.css'; 
+import DnDFlow from './DnDFlow';
+import './Dashboard.css';
 
 const Dashboard = () => {
   const [showModal, setShowModal] = useState(false);
   const [workflowName, setWorkflowName] = useState('');
-  const [workflows, setWorkflows] = useState([]); 
+  const [workflows, setWorkflows] = useState([]);
+  const [selectedWorkflow, setSelectedWorkflow] = useState(null);
+  const [nodes, setNodes] = useState([]); // Manage nodes at the Dashboard level
+  const [edges, setEdges] = useState([]); // Manage edges at the Dashboard level
 
   useEffect(() => {
     const savedWorkflows = JSON.parse(localStorage.getItem('workflows')) || [];
@@ -21,18 +23,34 @@ const Dashboard = () => {
     const newWorkflow = {
       _id: Date.now().toString(),
       workflowName: name,
+      flow: [] // Initialize with empty flow (nodes/edges)
     };
 
     const updatedWorkflows = [...workflows, newWorkflow];
 
-    
     setWorkflows(updatedWorkflows);
 
-    
     localStorage.setItem('workflows', JSON.stringify(updatedWorkflows));
 
-   
     setWorkflowName(newWorkflow.workflowName);
+    setSelectedWorkflow(newWorkflow.workflowName); // Set the newly created workflow as selected
+  };
+
+  const handleWorkflowSelect = (workflowName) => {
+    setWorkflowName(workflowName);
+    setSelectedWorkflow(workflowName);
+
+    // Load the nodes and edges of the selected workflow
+    const storedWorkflows = JSON.parse(localStorage.getItem('workflows')) || [];
+    const selectedWorkflowData = storedWorkflows.find(
+      (workflow) => workflow.workflowName === workflowName
+    );
+
+    if (selectedWorkflowData) {
+      const { nodes: storedNodes = [], edges: storedEdges = [] } = selectedWorkflowData.flow || {};
+      setNodes(storedNodes); // Load the saved nodes
+      setEdges(storedEdges); // Load the saved edges
+    }
   };
 
   return (
@@ -50,7 +68,14 @@ const Dashboard = () => {
       <div className="flex flex-1 mt-1">
         <div className="flex-1 flex">
           {workflowName ? (
-            <DnDFlow  />
+            <DnDFlow
+              nodes={nodes}
+              setNodes={setNodes}
+              edges={edges}
+              setEdges={setEdges}
+              workflows={workflows}
+              selectedWorkflow={selectedWorkflow}
+            />
           ) : (
             <>
               <div className="flex items-center justify-center h-full w-full">
@@ -61,7 +86,7 @@ const Dashboard = () => {
               <div className="flex">
                 <Sidebar
                   showModal={showModal}
-                  onWorkflowSelect={setWorkflowName}
+                  onWorkflowSelect={handleWorkflowSelect}
                   workflows={workflows}
                 />
               </div>
@@ -70,8 +95,15 @@ const Dashboard = () => {
         </div>
       </div>
 
-
-      <Footer setShowModal={setShowModal} showModal={showModal} />
+      <Footer
+        nodes={nodes}
+        edges={edges}
+        workflows={workflows}
+        selectedWorkflow={selectedWorkflow}
+        setSelectedWorkflow={setSelectedWorkflow}
+        setShowModal={setShowModal}
+        showModal={showModal}
+      />
 
       <WorkflowModal
         show={showModal}
@@ -81,7 +113,6 @@ const Dashboard = () => {
       />
     </div>
   );
-}
-
+};
 
 export default Dashboard;

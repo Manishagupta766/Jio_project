@@ -1,11 +1,18 @@
-import React, { useCallback } from 'react';
+import React, { useCallback, useState } from 'react'; 
 import { Handle, Position } from '@xyflow/react';
 
 const handleStyle = { background: '#555' }; 
-const UserNode = ({ data, isConnectable }) => {
+
+const UserNode = ({ data, isConnectable, onUpdateNode }) => {
+  const [nodeName, setNodeName] = useState(data.screenName || ''); 
+
   const onChange = useCallback((evt) => {
-    console.log(evt.target.value);
-  }, []);
+    const newValue = evt.target.value;
+    setNodeName(newValue);
+    if (onUpdateNode) { 
+      onUpdateNode({ id: data.id, screenName: newValue }); 
+    }
+  }, [data.id, onUpdateNode]);
 
   return (
     <div className="text-updater-node">
@@ -19,6 +26,7 @@ const UserNode = ({ data, isConnectable }) => {
         <input
           id="text"
           name="text"
+          value={nodeName}
           onChange={onChange}
           className="nodrag"
         />

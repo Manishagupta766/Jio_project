@@ -17,23 +17,18 @@ const WorkflowModal = ({ show, handleClose, title, onCreate }) => {
       return;
     }
 
-    for (let i = 0; i < localStorage.length; i++) {
-      const key = localStorage.key(i);
-      const workflow = JSON.parse(localStorage.getItem(key));
-      if (workflow.workflowName === workflowName) {
-        setNameExists(true);
-        return;
-      }
-    }
+    // Check if the workflow name already exists in localStorage
     const storedWorkflows = JSON.parse(localStorage.getItem('workflows')) || [];
+    const isNameDuplicate = storedWorkflows.some(
+      (workflow) => workflow.workflowName === workflowName
+    );
 
-    const uniqueKey = `workflow_${workflowName}_${Date.now()}`;
-
-    if (localStorage.getItem(uniqueKey)) {
+    if (isNameDuplicate) {
       setNameExists(true);
       return;
     }
 
+    const uniqueKey = `workflow_${workflowName}_${Date.now()}`;
     const newWorkflow = {
       _id: uniqueKey,
       workflowName,
@@ -41,21 +36,24 @@ const WorkflowModal = ({ show, handleClose, title, onCreate }) => {
       flow: [],
     };
 
-    localStorage.setItem(uniqueKey, JSON.stringify(newWorkflow));
+    // Update workflows in localStorage
     const updatedWorkflows = [...storedWorkflows, newWorkflow];
-    
-  localStorage.setItem('workflows', JSON.stringify(updatedWorkflows));
+    localStorage.setItem('workflows', JSON.stringify(updatedWorkflows));
 
-
+    // Notify parent component about the new workflow creation
     onCreate(workflowName);
 
-    setWorkflowName(newWorkflow.workflowName);
-        setWorkflowName("");
+    // Set the created workflow name for confirmation
+    setCreatedWorkflowName(workflowName);
+
+    // Reset the form fields
+    setWorkflowName("");
     setWorkflowDesc("");
     setNameExists(false);
     setErrors({});
     handleClose();
 
+    // Create downloadable JSON file
     const jsonString = JSON.stringify(newWorkflow, null, 2);
     const blob = new Blob([jsonString], { type: "application/json" });
     const url = URL.createObjectURL(blob);
