@@ -134,7 +134,7 @@ const DnDFlow = ({ showModal, workflows }) => {
       setEdges(storedEdges);
       setEdgeData(storedEdges);
     } else {
-      console.error('Selected workflow not found or has invalid format');
+      console.error('Selected workflow not rmat');
     }
   };
 
