@@ -1,18 +1,25 @@
 import React, { useCallback, useState } from 'react'; 
 import { Handle, Position } from '@xyflow/react';
 
-const handleStyle = { background: '#555' }; 
+const handleStyle = { background: '#555' };
 
-const UserNode = ({ data, isConnectable, onUpdateNode }) => {
-  const [nodeName, setNodeName] = useState(data.screenName || ''); 
+const UserNode = ({ data, isConnectable }) => {
+  const [nodeName, setNodeName] = useState(data.screenName || '');
+  console.log(data +"data");
 
   const onChange = useCallback((evt) => {
     const newValue = evt.target.value;
     setNodeName(newValue);
-    if (onUpdateNode) { 
-      onUpdateNode({ id: data.id, screenName: newValue }); 
+
+
+    const screenName = newValue;
+
+    if (data.onUpdateNode) { 
+      console.log("verifying");
+      data.onUpdateNode({ id: data.id, screenName: screenName });
+      
     }
-  }, [data.id, onUpdateNode]);
+  }, [data]);
 
   return (
     <div className="text-updater-node">

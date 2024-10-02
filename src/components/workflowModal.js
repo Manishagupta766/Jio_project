@@ -17,18 +17,23 @@ const WorkflowModal = ({ show, handleClose, title, onCreate }) => {
       return;
     }
 
-    // Check if the workflow name already exists in localStorage
-    const storedWorkflows = JSON.parse(localStorage.getItem('workflows')) || [];
-    const isNameDuplicate = storedWorkflows.some(
-      (workflow) => workflow.workflowName === workflowName
-    );
+    for (let i = 0; i < localStorage.length; i++) {
+      const key = localStorage.key(i);
+      const workflow = JSON.parse(localStorage.getItem(key));
+      if (workflow.workflowName === workflowName) {
+        setNameExists(true);
+        return;
+      }
+    }
 
-    if (isNameDuplicate) {
+    const storedWorkflows = JSON.parse(localStorage.getItem('workflows')) || [];
+    const uniqueKey = `workflow_${workflowName}_${Date.now()}`; // Corrected here
+
+    if (localStorage.getItem(uniqueKey)) {
       setNameExists(true);
       return;
     }
 
-    const uniqueKey = `workflow_${workflowName}_${Date.now()}`;
     const newWorkflow = {
       _id: uniqueKey,
       workflowName,
@@ -36,30 +41,26 @@ const WorkflowModal = ({ show, handleClose, title, onCreate }) => {
       flow: [],
     };
 
-    // Update workflows in localStorage
+    localStorage.setItem(uniqueKey, JSON.stringify(newWorkflow));
     const updatedWorkflows = [...storedWorkflows, newWorkflow];
+    
     localStorage.setItem('workflows', JSON.stringify(updatedWorkflows));
 
-    // Notify parent component about the new workflow creation
     onCreate(workflowName);
+    setCreatedWorkflowName(newWorkflow.workflowName); 
 
-    // Set the created workflow name for confirmation
-    setCreatedWorkflowName(workflowName);
-
-    // Reset the form fields
     setWorkflowName("");
     setWorkflowDesc("");
     setNameExists(false);
     setErrors({});
     handleClose();
 
-    // Create downloadable JSON file
     const jsonString = JSON.stringify(newWorkflow, null, 2);
     const blob = new Blob([jsonString], { type: "application/json" });
     const url = URL.createObjectURL(blob);
     const link = document.createElement("a");
     link.href = url;
-    link.download = `workflow_${newWorkflow._id}.json`;
+    link.download = `workflow_${newWorkflow._id}.json`; 
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);

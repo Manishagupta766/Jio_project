@@ -1,53 +1,74 @@
+
 import React, { useState } from 'react';
 import ButtonComponent from './footerButton';
 import WorkflowModal from './workflowModal';
+import useWorkflowStore from './useStore';
 
-const Footer = ({ nodes, edges, selectedWorkflow, saveWorkflow }) => {
+const Footer = ({ selectedWorkflow }) => {
   const [modalTitle, setModalTitle] = useState('');
   const [showModal, setShowModal] = useState(false);
 
-  const handleClick = (buttonName) => {
-    setModalTitle(buttonName);
+  const { nodes, edges } = useWorkflowStore(); 
+
+  const handleClick = (title) => {
+    setModalTitle(title);
     setShowModal(true);
   };
 
   const handleDeployWorkflow = () => {
-    alert("Handle Deploy Workflow");
+    alert('Handle Deploy Workflow');
   };
 
+
+  console.log(nodes +"Nodes");
   const handleSaveWorkflow = () => {
-    if (!selectedWorkflow) {
-      alert('Select a workflow first');
+    console.log('Selected Workflow:', selectedWorkflow);
+
+    if (!selectedWorkflow || selectedWorkflow.trim() === '') {
+      alert('Please select a workflow first.');
       return;
     }
+   
 
     const storedWorkflows = JSON.parse(localStorage.getItem('workflows')) || [];
+    let screenIdCounter = 1;
 
-    const formattedEdges = edges.map(edge => ({
-      source: edge.source,
-      target: edge.target,
-      id: edge.id
+    const formattedNodes = nodes.map((node, index) => ({
+      screenId: screenIdCounter.toString().padStart(2, '0'),
+      screenName: node.data.screenName|| "Default Name",
+      statusCode: `R00${screenIdCounter}`, 
+      nextNode: edges.find(edge => edge.source === node.id)?.target || '',
+      sequenceId: index + 1,
+      deeplink: '',
     }));
 
-    const formattedNodes = nodes.map(node => ({
-      id: node.id,
-      name: node.data.label
-    }));
+    screenIdCounter += nodes.length;
 
-    const updatedWorkflows = storedWorkflows.map(workflow => {
-      if (workflow.workflowName === selectedWorkflow) {
-        return {
-          ...workflow,
-          flow: [
-            ...formattedNodes,
-            ...formattedEdges
-          ],
-        };
-      }
-      return workflow;
-    });
+    const workflowExists = storedWorkflows.some(workflow => workflow.workflowName === selectedWorkflow);
 
-    localStorage.setItem('workflows', JSON.stringify(updatedWorkflows));
+    if (workflowExists) {
+      const updatedWorkflows = storedWorkflows.map(workflow => {
+        if (workflow.workflowName === selectedWorkflow) {
+          return {
+            ...workflow,
+            flow: [...workflow.flow, ...formattedNodes],
+          };
+        }
+        return workflow;
+      });
+
+      localStorage.setItem('workflows', JSON.stringify(updatedWorkflows));
+      console.log("Updated Workflows:", updatedWorkflows);
+    } else {
+      const newWorkflow = {
+        workflowName: selectedWorkflow,
+        flow: formattedNodes,
+      };
+      storedWorkflows.push(newWorkflow);
+      localStorage.setItem('workflows', JSON.stringify(storedWorkflows));
+      console.log("New Workflow Created:", newWorkflow);
+    }
+
     alert('Workflow saved successfully!');
   };
 
@@ -58,12 +79,7 @@ const Footer = ({ nodes, edges, selectedWorkflow, saveWorkflow }) => {
       <ButtonComponent text="Save Workflow" onClick={handleSaveWorkflow} />
       <ButtonComponent text="Deploy Workflow" onClick={handleDeployWorkflow} />
       <ButtonComponent text="Create New Workflow" onClick={() => handleClick('Create New Workflow')} />
-      <WorkflowModal
-        show={showModal}
-        handleClose={handleClose}
-        title={modalTitle}
-        onCreate={(workflowName) => setSelectedWorkflow(workflowName)}
-      />
+      <WorkflowModal show={showModal} handleClose={handleClose} title={modalTitle} />
     </div>
   );
 };

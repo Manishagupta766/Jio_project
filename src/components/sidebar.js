@@ -1,129 +1,3 @@
-// import React, { useState, useEffect } from 'react';
-// import { useNavigate } from 'react-router-dom';
-// import PropTypes from 'prop-types';
-// import '../index.css';
-// import { useDnD } from './DnDContext';
-
-// const CustomButton = ({ text, onClick, onDragStart }) => {
-//   return (
-//     <div
-//       className="bg-gray-300 bg-opacity-90 text-black p-3 rounded-lg border-2 my-4 mx-auto text-center cursor-pointer text-lg transition-all duration-300 hover:bg-opacity-80"
-//       onClick={onClick}
-//       role="button"
-//       tabIndex={0}
-//       onKeyDown={(e) => { if (e.key === 'Enter') onClick(); }}
-//       draggable
-//       onDragStart={onDragStart}
-//     >
-//       {text}
-//     </div>
-//   );
-// };
-
-// CustomButton.propTypes = {
-//   text: PropTypes.string.isRequired,
-//   onClick: PropTypes.func,
-//   onDragStart: PropTypes.func.isRequired,
-// };
-
-// const Sidebar = ({ showModal, onWorkflowSelect }) => {
-//   const navigate = useNavigate();
-//   const [workflows, setWorkflows] = useState([]);
-//   const [filteredWorkflows, setFilteredWorkflows] = useState([]);
-//   const [selectedWorkflow, setSelectedWorkflow] = useState('');
-
-//   useEffect(() => {
-//     try {
-//       const savedWorkflows = JSON.parse(localStorage.getItem('workflows')) || [];
-//       if (Array.isArray(savedWorkflows)) {
-//         setWorkflows(savedWorkflows);
-//         setFilteredWorkflows(savedWorkflows);
-//         if (savedWorkflows.length > 0) {
-//           setSelectedWorkflow(savedWorkflows[0]._id);
-//         }
-//       } else {
-//         setWorkflows([]);
-//         setFilteredWorkflows([]);
-//       }
-//     } catch (error) {
-//       console.error('Failed to parse workflows from localStorage:', error);
-//       setWorkflows([]);
-//       setFilteredWorkflows([]);
-//     }
-//   }, [showModal]);
-
-//   const handleDropdownChange = (e) => {
-//     const selectedId = e.target.value;
-//     setSelectedWorkflow(selectedId);
-//     const selectedWorkflowObj = workflows.find(workflow => workflow._id === selectedId);
-//     if (selectedWorkflowObj) {
-//       if (typeof onWorkflowSelect === 'function') {
-//         onWorkflowSelect(selectedWorkflowObj.workflowName);
-//       } else {
-//         console.error('onWorkflowSelect is not a function');
-//       }
-//       navigate('/', { state: { workflowName: selectedWorkflowObj.workflowName } });
-//     }
-//   };
-
-//   const [_, setType] = useDnD();
-
-//   const onDragStart = (event, nodeType) => {
-//     setType(nodeType);
-//     event.dataTransfer.setData("application/reactflow", nodeType);
-//     event.dataTransfer.effectAllowed = "move";
-//   };
-
-//   return (
-//     <div className="p-3 bg-white border-r border-gray-200" style={{ width: '400px' }}>
-//       <div className="relative mb-4">
-//         {filteredWorkflows.length === 0 ? (
-//           <p>No workflows available</p>
-//         ) : (
-//           <select
-//             id="workflow_select"
-//             className="block py-2.5 px-0 w-full text-md text-gray-500 bg-transparent border-b-2 border-black focus:outline-none focus:ring-0 focus:border-black"
-//             value={selectedWorkflow}
-//             onChange={handleDropdownChange}
-//           >
-//             <option value="" disabled>Select Workflow</option>
-//             {filteredWorkflows.map(workflow => (
-//               <option key={workflow._id} value={workflow._id}>
-//                 {workflow.workflowName}
-//               </option>
-//             ))}
-//           </select>
-//         )}
-//       </div>
-
-//       <h5 className="mb-4 mt-4 text-lg font-semibold">You can drag these nodes to the pane on the right.</h5>
-      
-//       <CustomButton
-//         text='Start Event'
-//         onDragStart={(event) => onDragStart(event, 'input')}
-//       />
-      
-//       <CustomButton
-//         text="Users Event"
-//         onDragStart={(event) => onDragStart(event, 'default')}
-//       />
-      
-//       <CustomButton
-//         text="End Event"
-//         onDragStart={(event) => onDragStart(event, 'output')}
-//       />
-//     </div>
-//   );
-// };
-
-// Sidebar.propTypes = {
-//   showModal: PropTypes.bool.isRequired,
-//   onWorkflowSelect: PropTypes.func.isRequired,
-// };
-
-// export default Sidebar;
-
-
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import PropTypes from 'prop-types';
@@ -146,106 +20,87 @@ const CustomButton = ({ text, onClick, onDragStart }) => {
   );
 };
 
-CustomButton.propTypes = {
-  text: PropTypes.string.isRequired,
-  onClick: PropTypes.func,
-  onDragStart: PropTypes.func.isRequired,
-};
 
-const Sidebar = ({ showModal, onWorkflowSelect }) => {
+const Sidebar = ({ showModal, setWorkflowName, workflows, selectedWorkflow }) => {
   const navigate = useNavigate();
-  const [workflows, setWorkflows] = useState([]);
   const [filteredWorkflows, setFilteredWorkflows] = useState([]);
-  const [selectedWorkflow, setSelectedWorkflow] = useState('');
 
+  
   useEffect(() => {
     try {
       const savedWorkflows = JSON.parse(localStorage.getItem('workflows')) || [];
       if (Array.isArray(savedWorkflows)) {
-        setWorkflows(savedWorkflows);
         setFilteredWorkflows(savedWorkflows);
-        if (savedWorkflows.length > 0) {
-          setSelectedWorkflow(savedWorkflows[0]._id);
-        }
       } else {
-        setWorkflows([]);
         setFilteredWorkflows([]);
       }
     } catch (error) {
       console.error('Failed to parse workflows from localStorage:', error);
-      setWorkflows([]);
       setFilteredWorkflows([]);
     }
   }, [showModal]);
 
   const handleDropdownChange = (e) => {
     const selectedId = e.target.value;
-    setSelectedWorkflow(selectedId);
-    const selectedWorkflowObj = workflows.find(workflow => workflow._id === selectedId);
+    const selectedWorkflowObj = filteredWorkflows.find(workflow => workflow._id === selectedId);
+
     if (selectedWorkflowObj) {
-      if (typeof onWorkflowSelect === 'function') {
-        onWorkflowSelect(selectedWorkflowObj.workflowName);
-      } else {
-        console.error('onWorkflowSelect is not a function');
-      }
+      console.log('Dropdown selected workflow:', selectedWorkflowObj.workflowName); 
+    
+    
       navigate('/', { state: { workflowName: selectedWorkflowObj.workflowName } });
     }
   };
 
-  const [_, setType] = useDnD();
-
+  const [_, setType] = useDnD();  
   const onDragStart = (event, nodeType) => {
-    setType(nodeType);
+    setType(nodeType);  
     event.dataTransfer.setData("application/reactflow", nodeType);
     event.dataTransfer.effectAllowed = "move";
   };
 
   return (
     <div className="p-3 bg-white border-r border-gray-200" style={{ width: '400px' }}>
+     
       <div className="relative mb-4">
-        {filteredWorkflows.length === 0 ? (
-          <p>No workflows available</p>
-        ) : (
-          <select
-            id="workflow_select"
-            className="block py-2.5 px-0 w-full text-md text-gray-500 bg-transparent border-b-2 border-black focus:outline-none focus:ring-0 focus:border-black"
-            value={selectedWorkflow}
-            onChange={handleDropdownChange}
-          >
-            <option value="" disabled>Select Workflow</option>
-            {filteredWorkflows.map(workflow => (
-              <option key={workflow._id} value={workflow._id}>
-                {workflow.workflowName}
-              </option>
-            ))}
-          </select>
-        )}
+        <select
+          id="workflow_select"
+          className="block py-2.5 px-0 w-full text-md text-gray-500 bg-transparent border-b-2 border-black focus:outline-none focus:ring-0 focus:border-black"
+          value={selectedWorkflow}
+          onChange={handleDropdownChange}
+        >
+          <option value="" disabled>Select Workflow</option>
+          {filteredWorkflows.map(workflow => (
+            <option key={workflow._id} value={workflow._id}>
+              {workflow.workflowName}
+            </option>
+          ))}
+        </select>
       </div>
 
       <h5 className="mb-4 mt-4 text-lg font-semibold">You can drag these nodes to the pane on the right.</h5>
       
+   
       <CustomButton
         text='Start Event'
-        onDragStart={(event) => onDragStart(event, 'input')}
+        onDragStart={(event) => onDragStart(event, 'input')} 
       />
       
+
       <CustomButton
         text="Users Event"
-        onDragStart={(event) => onDragStart(event, 'default')}
+        onDragStart={(event) => onDragStart(event, 'default')}  
       />
       
+    
       <CustomButton
         text="End Event"
-        onDragStart={(event) => onDragStart(event, 'output')}
+        onDragStart={(event) => onDragStart(event, 'output')} 
       />
     </div>
   );
 };
 
-Sidebar.propTypes = {
-  showModal: PropTypes.bool.isRequired,
-  onWorkflowSelect: PropTypes.func.isRequired,
-};
+
 
 export default Sidebar;
-
